@@ -1,0 +1,122 @@
+<%- include('partials/head') %>
+<style>
+    .create-blog-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 30px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .blog-form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-group label {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        font-family: inherit;
+    }
+
+    .form-group textarea {
+        min-height: 200px;
+        resize: vertical;
+    }
+
+    .submit-btn {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+    }
+
+    .submit-btn:hover {
+        background-color: #0056b3;
+    }
+</style>
+<body>
+    <%- include('partials/nav') %>
+    
+    <div class="create-blog-container">
+        <h1><%= title %></h1>
+        <form class="blog-form">
+            <div class="form-group">
+                <label for="blog-title">Blog Title:</label>
+                <input 
+                    type="text" 
+                    id="blog-title" 
+                    name="title" 
+                    required 
+                    placeholder="Enter your blog title"
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="blog-content">Blog Content:</label>
+                <textarea 
+                    id="blog-content" 
+                    name="content" 
+                    required 
+                    placeholder="Write your blog content here..."
+                ></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">Publish Blog</button>
+        </form>
+    </div>
+
+    <%- include('partials/footer') %>
+    <script>
+    document.querySelector('.blog-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = {
+            title: document.getElementById('blog-title').value,
+            content: document.getElementById('blog-content').value
+        };
+
+        try {
+            const response = await fetch('/create-blog', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert('Blog posted successfully!');
+                window.location.href = '/latest-posts';  // we willredirect to bloglistpage 
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch (err) {
+            alert('Error posting blog: ' + err.message);
+        }
+    });
+    </script>
+</body>
+</html> 

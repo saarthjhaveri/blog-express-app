@@ -1,0 +1,67 @@
+<%- include('partials/head') %>
+<style>
+    .main-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 50px 20px;
+    }
+
+    .container {
+        text-align: center;
+        padding: 30px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        max-width: 800px;
+        width: 100%;
+        margin-bottom: 30px;
+    }
+
+    .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+    }
+
+    .feature-card {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: left;
+    }
+
+    .feature-card h3 {
+        color: #333;
+        margin-top: 0;
+    }
+</style>
+<body>
+    <%- include('partials/nav') %>
+    
+    <div class="main-content">
+        <div class="container">
+            <h1>Hello <%= name %>! 👋</h1>
+            <p><%= message %></p>
+            
+            <div class="features">
+                <div class="feature-card">
+                    <h3><a href="/latest-posts" style="text-decoration: none; color: inherit;">Latest Posts</a></h3>
+                    <p>Check out our most recent blog posts and stay updated with the latest content.</p>
+                </div>
+                <div class="feature-card">
+                    <h3><a href="/create-blog" style="text-decoration: none; color: inherit;">Create Blog</a></h3>
+                    <p>Share your thoughts and ideas by creating a new blog post.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Categories</h3>
+                    <p>Browse through different categories to find the content that interests you most.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+</body>
+</html>

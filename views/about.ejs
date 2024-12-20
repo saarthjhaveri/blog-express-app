@@ -1,0 +1,55 @@
+<%- include('partials/head') %>
+<style>
+    .container {
+        max-width: 800px;
+        margin: 40px auto;
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .profile-section {
+        margin-bottom: 20px;
+    }
+
+    h1 {
+        color: #333;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+    }
+
+    .about-content {
+        line-height: 1.6;
+    }
+
+    .about-content h2 {
+        color: #444;
+        margin-top: 30px;
+    }
+
+    .about-content p {
+        margin: 10px 0;
+        color: #666;
+    }
+</style>
+<body>
+    <%- include('partials/nav') %>
+    
+    <div class="container">
+        <h1><%= title %></h1>
+        <div class="about-content">
+            <h2>About <%= name %></h2>
+            <p>Profession: <%= profession %></p>
+            <p>Location: <%= location %></p>
+            <p>Specialties: <%= specialties %></p>
+            <p>Interests: <%= interests %></p>
+            <p>Experience: <%= experience %> years in <%= field %></p>
+            <p>Projects: <%= projects %></p>
+            <p>Contact: <%= email %></p>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+</body>
+</html>
