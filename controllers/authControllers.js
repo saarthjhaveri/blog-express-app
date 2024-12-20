@@ -79,6 +79,12 @@ const authController = {
       console.log(err);
       res.status(400).json({ error: err.message });
     }
+  },
+
+  logout_get: (req, res) => {
+    // Set jwt cookie to empty string and expire in 1 millisecond
+    res.cookie('jwt', '', { maxAge: 1 });
+    res.redirect('/');
   }
 };
 

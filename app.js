@@ -14,11 +14,7 @@ const app = express();
 const morgan = require('morgan'); //loggers for middleware 
 
 app.use(morgan('dev'));
-const authMiddleware = require('./middleware/authMiddleware');
-
-
-
-
+const { requireAuth, checkUser } = require('./middleware/authMiddleware');
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -26,12 +22,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-
 app.set('view engine', 'ejs');
 
+// Apply checkUser middleware to all routes
+app.get('*', checkUser);
 app.use(authRoutes);
-
-
 
 //db uri 
 const DBURI = 'mongodb+srv://saarth62:Saarth11@cluster0.dlm61.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
@@ -46,20 +41,6 @@ mongoose.connect(DBURI)
     console.error('Error connecting to MongoDB:', err);
   });
 
-
-//typical middleware processes 
-
-// app.use((req,res, next) => {
-
-//     console.log("new request made")
-//     console.log("request method ", req.method);
-//     console.log("request url", req.url);
-//     console.log("request host", req.host);
-//     next();
-// })
-
-
-
 app.get('/', (req, res) => {
     res.render('index', {
       title: 'Hello Guys!',
@@ -68,12 +49,7 @@ app.get('/', (req, res) => {
     });
   });
 
-
-// app.get('/', (req, res) => {
-//     res.sendFile(path.join(__dirname, 'views', 'index.html'));
-// });
-
-app.get('/about', authMiddleware , (req, res) => {
+app.get('/about' ,requireAuth, (req, res) => {
     res.render('about', {
         title: 'About Me',
         name: 'Saarth',
@@ -87,9 +63,6 @@ app.get('/about', authMiddleware , (req, res) => {
         email: 'saarth62@gmail.com'
     });
 });
-
-
-
 
 app.get('/latest-posts', async (req, res) => {
     try {
@@ -106,7 +79,7 @@ app.get('/latest-posts', async (req, res) => {
     }
 });
 
-app.get('/create-blog', authMiddleware, (req, res) => {
+app.get('/create-blog', requireAuth, (req, res) => {
     res.render('create-blog', {
         title: 'Create New Blog Post'
     });
