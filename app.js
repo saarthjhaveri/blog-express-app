@@ -5,17 +5,33 @@ const { nextTick } = require('process');
 const mongoose= require('mongoose');
 const bodyParser = require('express').json();
 
+const cookieParser= require('cookie-parser');
+
+const authRoutes = require('./routes/authRoutes');
+
 const app = express();
 
-const morgan = require('morgan');
-app.use(morgan('dev'));
+const morgan = require('morgan'); //loggers for middleware 
 
-app.set('view engine', 'ejs');
+app.use(morgan('dev'));
+const authMiddleware = require('./middleware/authMiddleware');
+
+
+
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
+
+
+app.set('view engine', 'ejs');
+
+app.use(authRoutes);
+
+
 
 //db uri 
 const DBURI = 'mongodb+srv://saarth62:Saarth11@cluster0.dlm61.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
@@ -57,7 +73,7 @@ app.get('/', (req, res) => {
 //     res.sendFile(path.join(__dirname, 'views', 'index.html'));
 // });
 
-app.get('/about', (req, res) => {
+app.get('/about', authMiddleware , (req, res) => {
     res.render('about', {
         title: 'About Me',
         name: 'Saarth',
@@ -90,7 +106,7 @@ app.get('/latest-posts', async (req, res) => {
     }
 });
 
-app.get('/create-blog', (req, res) => {
+app.get('/create-blog', authMiddleware, (req, res) => {
     res.render('create-blog', {
         title: 'Create New Blog Post'
     });
@@ -98,7 +114,7 @@ app.get('/create-blog', (req, res) => {
 
 const Blog = require('./models/blog');
 
-app.post('/create-blog', async (req, res) => {
+app.post('/create-blog',  async (req, res) => {
   try {
     const blog = new Blog({
       title: req.body.title,
@@ -153,6 +169,8 @@ app.use((req, res) => {
     });
 });
 
+
+// app.use(authRoutes);
 
 
 // app.listen(3001, () => {
