@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-
 const blogSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -11,7 +10,8 @@ const blogSchema = new mongoose.Schema({
     required: true
   },
   author: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   },
   createdAt: {
@@ -23,6 +23,5 @@ const blogSchema = new mongoose.Schema({
     default: Date.now
   }
 });
-
 
 module.exports = mongoose.model('Blog', blogSchema);

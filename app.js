@@ -9,6 +9,10 @@ const cookieParser= require('cookie-parser');
 
 const authRoutes = require('./routes/authRoutes');
 
+const jwt = require('jsonwebtoken'); // Import jsonwebtoken
+const User = require('./models/user'); // Ensure User model is imported
+
+
 const app = express();
 
 const morgan = require('morgan'); //loggers for middleware 
@@ -49,29 +53,74 @@ app.get('/', (req, res) => {
     });
   });
 
-app.get('/about' ,requireAuth, (req, res) => {
-    res.render('about', {
-        title: 'About Me',
-        name: 'Saarth',
-        profession: 'Software engineer',
-        location: 'Ind',
-        specialties: 'building things from scratch',
-        interests: 'engineering',
-        experience: '1.5',
-        field: 'Software',
-        projects: 'different types of projects ranging from quantitiative strategies investments to AI',
-        email: 'saarth62@gmail.com'
-    });
+
+app.get('/about', requireAuth, async (req, res) => {
+    try {
+        // Get user ID from JWT token
+        const token = req.cookies.jwt;
+        const decoded = jwt.verify(token, 'randomsecret123'); // Now jwt is defined
+        const userId = decoded.id;
+
+        // Fetch user data
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            return res.status(404).render('error', {
+                title: 'Error',
+                message: 'User not found'
+            });
+        }
+
+        res.render('about', {
+            title: 'About Me',
+            name: user.name,
+            profession: user.profession,
+            location: user.location,
+            specialties: user.specialties,
+            interests: user.interests,
+            experience: user.experience,
+            field: user.field,
+            projects: user.projects,
+            email: user.email
+        });
+    } catch (err) {
+        console.error('Error in about page:', err);
+        res.status(500).render('error', {
+            title: 'Error',
+            message: 'Error loading profile'
+        });
+    }
 });
 
 app.get('/latest-posts', async (req, res) => {
     try {
-        const blogs = await Blog.find().sort({ createdAt: -1 });
+        const blogs = await Blog.find()
+            .sort({ createdAt: -1 })
+            .populate({
+                path: 'author',
+                select: 'name email',
+                model: 'User'
+            });
+        
+        // Get current user's ID if they are logged in
+        let currentUserId = null;
+        const token = req.cookies.jwt;
+        if (token) {
+            try {
+                const decoded = jwt.verify(token, 'randomsecret123');
+                currentUserId = decoded.id;
+            } catch (err) {
+                console.log('JWT verification failed:', err.message);
+            }
+        }
+
         res.render('latest-posts', {
             title: 'Latest Posts',
-            blogs: blogs
+            blogs: blogs,
+            currentUserId: currentUserId
         });
     } catch (err) {
+        console.error('Error fetching blog posts:', err);
         res.status(500).render('error', {
             title: 'Error',
             message: 'Error fetching blog posts'
@@ -87,12 +136,16 @@ app.get('/create-blog', requireAuth, (req, res) => {
 
 const Blog = require('./models/blog');
 
-app.post('/create-blog',  async (req, res) => {
+app.post('/create-blog', requireAuth, async (req, res) => {
   try {
+    const token = req.cookies.jwt;
+    const decoded = jwt.verify(token, 'randomsecret123');
+    const userId = decoded.id;
+
     const blog = new Blog({
       title: req.body.title,
       content: req.body.content,
-      author: 'Saarth'
+      author: userId
     });
     
     const savedBlog = await blog.save();

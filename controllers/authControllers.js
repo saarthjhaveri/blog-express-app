@@ -1,11 +1,5 @@
-const User= require('../models/user');
-
-
+const User = require('../models/user');
 const jwt = require('jsonwebtoken');
-
-
-
-// ... existing imports ...
 
 const maxAge = 3 * 24 * 60 * 60; // 3 days in seconds
 const createToken = (id) => {
@@ -22,12 +16,34 @@ const authController = {
         message: 'Please sign up to continue'
     });
   },
-  
+
   signup_post: async (req, res) => {
-    const { email, password } = req.body;
+    const { 
+      email, 
+      password, 
+      name,
+      profession,
+      location,
+      specialties,
+      interests,
+      experience,
+      field,
+      projects 
+    } = req.body;
     
     try {
-      const user = await User.create({ email, password });
+      const user = await User.create({ 
+        email, 
+        password,
+        name,
+        profession,
+        location,
+        specialties,
+        interests,
+        experience,
+        field,
+        projects
+      });
       const token = createToken(user._id);
       
       // Set cookie
@@ -39,7 +55,11 @@ const authController = {
       res.status(201).json({ user: user._id });
     } catch (err) {
       console.log(err);
-      res.status(400).json({ error: err.message });
+      let errorMessage = err.message;
+      if (err.code === 11000) {
+        errorMessage = 'Email already registered';
+      }
+      res.status(400).json({ error: errorMessage });
     }
   },
 
@@ -82,10 +102,14 @@ const authController = {
   },
 
   logout_get: (req, res) => {
-    // Set jwt cookie to empty string and expire in 1 millisecond
     res.cookie('jwt', '', { maxAge: 1 });
     res.redirect('/');
   }
 };
-
-module.exports = { authController };
+module.exports = {
+  signup_get: authController.signup_get,
+  signup_post: authController.signup_post,
+  login_get: authController.login_get,
+  login_post: authController.login_post,
+  logout_get: authController.logout_get
+};

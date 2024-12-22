@@ -66,13 +66,15 @@
                         <p><%= blog.content %></p>
                     </div>
                     <div class="blog-meta">
-                        <span>By <%= blog.author %></span>
+                        <span>By <%= blog.author ? blog.author.name : 'Unknown Author' %></span>
                         <span>Created: <%= new Date(blog.createdAt).toLocaleDateString('en-US', { 
                             year: 'numeric', 
                             month: 'long', 
                             day: 'numeric'
                         }) %></span>
-                        <button class="delete-btn" onclick="deleteBlog('<%= blog._id %>')">Delete</button>
+                        <% if (currentUserId && blog.author && blog.author._id.toString() === currentUserId) { %>
+                            <button class="delete-btn" onclick="deleteBlog('<%= blog._id %>')">Delete</button>
+                        <% } %>
                     </div>
                 </article>
             <% }); %>

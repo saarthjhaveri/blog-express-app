@@ -1,22 +1,72 @@
 <%- include('partials/head') %>
 
-<form>
-  <h2>Sign Up</h2>
-  
-  <div class="form-group">
-    <label for="email">Email</label>
-    <input type="email" name="email" required />
-    <div class="email error"></div>
-  </div>
-  
-  <div class="form-group">
-    <label for="password">Password</label>
-    <input type="password" name="password" required />
-    <div class="password error"></div>
-  </div>
+<div class="container">
+  <form>
+    <h2>Sign Up</h2>
+    
+    <div class="form-group">
+      <label for="email">Email*</label>
+      <input type="email" name="email" required />
+      <div class="email error"></div>
+    </div>
+    
+    <div class="form-group">
+      <label for="password">Password* (min 6 characters)</label>
+      <input type="password" name="password" required minlength="6" />
+      <div class="password error"></div>
+    </div>
 
-  <button type="submit">Sign Up</button>
-</form>
+    <div class="form-group">
+      <label for="name">Full Name*</label>
+      <input type="text" name="name" required />
+      <div class="name error"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="profession">Profession*</label>
+      <input type="text" name="profession" required />
+      <div class="profession error"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="location">Location*</label>
+      <input type="text" name="location" required />
+      <div class="location error"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="specialties">Specialties*</label>
+      <input type="text" name="specialties" required />
+      <div class="specialties error"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="interests">Interests*</label>
+      <input type="text" name="interests" required />
+      <div class="interests error"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="experience">Years of Experience*</label>
+      <input type="text" name="experience" required />
+      <div class="experience error"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="field">Field*</label>
+      <input type="text" name="field" required />
+      <div class="field error"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="projects">Projects*</label>
+      <textarea name="projects" required></textarea>
+      <div class="projects error"></div>
+    </div>
+
+    <button type="submit">Sign Up</button>
+  </form>
+</div>
 
 <script>
 const form = document.querySelector('form');
@@ -27,23 +77,39 @@ form.addEventListener('submit', async (e) => {
   e.preventDefault();
   
   // Reset errors
-  emailError.textContent = '';
-  passwordError.textContent = '';
+  document.querySelectorAll('.error').forEach(error => error.textContent = '');
 
-  // Get form values
-  const email = form.email.value;
-  const password = form.password.value;
+  // Get all form values
+  const formData = {
+    email: form.email.value,
+    password: form.password.value,
+    name: form.name.value,
+    profession: form.profession.value,
+    location: form.location.value,
+    specialties: form.specialties.value,
+    interests: form.interests.value,
+    experience: form.experience.value,
+    field: form.field.value,
+    projects: form.projects.value
+  };
 
   try {
     const res = await fetch('/signup', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify(formData),
       headers: { 'Content-Type': 'application/json' }
     });
     const data = await res.json();
     
     if (data.error) {
-      emailError.textContent = data.error;
+      // Show error in respective field
+      const errorField = data.error.split(' ')[0].toLowerCase();
+      const errorDiv = document.querySelector(`.${errorField}.error`);
+      if (errorDiv) {
+        errorDiv.textContent = data.error;
+      } else {
+        emailError.textContent = data.error;
+      }
     }
     if (data.user) {
       location.assign('/'); // redirect to home page
@@ -56,34 +122,72 @@ form.addEventListener('submit', async (e) => {
 </script>
 
 <style>
-  form {
-    max-width: 360px;
+  .container {
+    max-width: 600px;
     margin: 40px auto;
-    padding: 20px;
-    background: #f4f4f4;
-    border-radius: 4px;
+    padding: 0 20px;
   }
+
+  form {
+    background: #f4f4f4;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 25px;
+  }
+
   .form-group {
     margin-bottom: 20px;
   }
-  input {
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+    font-weight: 500;
+  }
+
+  input, textarea {
     width: 100%;
-    padding: 8px;
-    margin-top: 5px;
+    padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
     box-sizing: border-box;
+    transition: border-color 0.3s ease;
   }
+
+  textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: #3498db;
+  }
+
   button {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     background: #3498db;
     border: none;
     color: white;
     font-size: 16px;
     border-radius: 4px;
     cursor: pointer;
+    transition: background 0.3s ease;
+    margin-top: 10px;
   }
+
+  button:hover {
+    background: #2980b9;
+  }
+
   .error {
     color: #e74c3c;
     font-size: 14px;
